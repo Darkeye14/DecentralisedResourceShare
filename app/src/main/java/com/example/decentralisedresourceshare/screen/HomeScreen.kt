@@ -134,16 +134,25 @@ fun HomeScreen(
                     }
                     HomeScreenCard(Modifier.weight(1f), text = "Approved requests") {
 
-                        navigateTo(navController, DestinationScreen.NodeSetupScreen.route)
+                        navigateTo(navController, DestinationScreen.ApprovedNodeScreen.route)
                     }
                 }
                 Row(modifier = Modifier.padding(8.dp)) {
                     HomeScreenCard(Modifier.weight(1f), text = "Upload Photos") {
-                        navigateTo(navController,DestinationScreen.PendingScreen.route)
+                        navigateTo(navController,DestinationScreen.PicsUploadScreen.route)
                     }
                     HomeScreenCard(Modifier.weight(1f), text = "Photo Gallery") {
 
-                        navigateTo(navController, DestinationScreen.NodeSetupScreen.route)
+                        navigateTo(navController, DestinationScreen.PicsDownloadScreen.route)
+                    }
+                }
+                Row(modifier = Modifier.padding(8.dp)) {
+                    HomeScreenCard(Modifier.weight(1f), text = "Docs") {
+                        navigateTo(navController,DestinationScreen.DocsScreen.route)
+                    }
+                    HomeScreenCard(Modifier.weight(1f), text = "Developer's Details") {
+
+                        navigateTo(navController, DestinationScreen.DevDetailsScreen.route)
                     }
                 }
 
@@ -166,7 +175,7 @@ fun HomeScreenCard(
         .padding(8.dp),
         colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)) {
         Row(
-            modifier = Modifier.fillMaxHeight(),
+            modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {

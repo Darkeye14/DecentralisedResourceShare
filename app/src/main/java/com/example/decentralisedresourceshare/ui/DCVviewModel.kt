@@ -1,20 +1,30 @@
 package com.example.decentralisedresourceshare.ui
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.decentralisedresourceshare.ACCOUNTS
+import com.example.decentralisedresourceshare.ALLPICS
 import com.example.decentralisedresourceshare.NODES
+import com.example.decentralisedresourceshare.SAVEDNODES
 import com.example.decentralisedresourceshare.data.Account
+import com.example.decentralisedresourceshare.data.AllPicsUploadList
 import com.example.decentralisedresourceshare.data.Chat
 import com.example.decentralisedresourceshare.data.ChatData
+import com.example.decentralisedresourceshare.data.ImgData
 import com.example.decentralisedresourceshare.data.Node
+import com.example.decentralisedresourceshare.data.PicUid
 import com.example.decentralisedresourceshare.geminiChat.ChatState
 import com.example.decentralisedresourceshare.geminiChat.ChatUiEvent
 import com.example.decentralisedresourceshare.nav.DestinationScreen
+import com.example.decentralisedresourceshare.states.allImageUriList
 import com.example.decentralisedresourceshare.states.approvedSavedNodes
 import com.example.decentralisedresourceshare.states.errorMsg
+import com.example.decentralisedresourceshare.states.imageUriList
 import com.example.decentralisedresourceshare.states.inProgress
 import com.example.decentralisedresourceshare.states.onError
 import com.example.decentralisedresourceshare.states.savedNodes
@@ -24,8 +34,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,6 +47,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,27 +70,28 @@ class DcvViewModel @Inject constructor(
         password: String,
         navController: NavController
     ) = CoroutineScope(Dispatchers.IO).launch {
-        inProgress.value = true
 
-        auth.createUserWithEmailAndPassword(email, password)
-
-            .addOnFailureListener {
-                handleException(it)
-            }
-            .addOnCompleteListener {
-
-                if (it.isSuccessful) {
-                    createAccount(name, email, password)
-                    inProgress.value = false
-                    navigateTo(navController, DestinationScreen.HomeScreen.route)
-                } else {
-                    handleException(customMessage = " SignUp error")
+        if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
+            inProgress.value = true
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnFailureListener {
+                    handleException(it)
                 }
-            }
-    }
+                .addOnCompleteListener {
 
+                    if (it.isSuccessful) {
+                        createAccount(name, email, password)
+                        inProgress.value = false
+                        navigateTo(navController, DestinationScreen.HomeScreen.route)
+                    } else {
+                        handleException(customMessage = " SignUp error")
+                    }
+                }
+        }
+    }
     init {
         populatePendingNode()
+        populateApprovedNode()
     }
 
     private fun createAccount(
@@ -299,7 +313,7 @@ class DcvViewModel @Inject constructor(
 
     }
     fun populateApprovedNode() = CoroutineScope(Dispatchers.Main).launch {
-        db.collection(NODES)
+        db.collection(SAVEDNODES)
             .whereEqualTo("auth", auth.currentUser?.uid?.toString())
             .addSnapshotListener { value, error ->
                 if (error != null) {
@@ -314,6 +328,71 @@ class DcvViewModel @Inject constructor(
             }
 
     }
+    fun uploadAllImage(
+        imgList: List<Uri?>
+    ) = CoroutineScope(Dispatchers.IO).launch {
 
+        val storageRef = storage.reference
+        imgList.forEach {
+            val imgId = UUID.randomUUID().toString()
+            val pfp = AllPicsUploadList(
+                uid = imgId
+            )
+            db.collection(ALLPICS).document(imgId).set(pfp)
+            val imageRef = storageRef.child("AllImages/$imgId")
+            val uploadTask = it.let { it1 ->
+                imageRef
+                    .putFile(it1!!)
+            }
+            uploadTask.addOnSuccessListener {
+                it.metadata
+                    ?.reference
+                    ?.downloadUrl
+                inProgress.value = false
+            }
+                .addOnFailureListener {
+                    handleException(it)
+                }
+        }
+    }
+
+    fun downloadAllImages(uid: String?) = CoroutineScope(Dispatchers.IO).launch {
+        val imageUri = mutableStateOf<Bitmap?>(null)
+        inProgress.value = true
+
+        try {
+            val maxDownloadSize = 5L * 1024 * 1024
+            val storageRef = FirebaseStorage.getInstance().reference
+
+            val bytes = storageRef.child("AllImages/$uid")
+                .getBytes(maxDownloadSize)
+                .await()
+            imageUri.value = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            val data = ImgData(
+                uid = uid,
+                bitmap = imageUri.value
+            )
+            allImageUriList.add(data)
+
+
+        } catch (e: Exception) {
+            handleException(e)
+        }
+        inProgress.value = false
+    }
+    fun onShowAllPics() = CoroutineScope(Dispatchers.IO).launch {
+        inProgress.value = true
+
+        val snapShot = db.collection(ALLPICS)
+            .get()
+            .await()
+
+        for (doc in snapShot.documents) {
+            val post = doc.toObject<PicUid>()
+            downloadAllImages(post!!.uid)
+
+        }
+        inProgress.value = false
+    }
 
 }

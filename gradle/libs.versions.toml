@@ -19,6 +19,8 @@ firebaseCrashlytics = "19.0.3"
 googleFirebaseCrashlytics = "3.0.2"
 firebasePerf = "21.0.1"
 googleFirebaseFirebasePerf = "1.4.2"
+firebaseAnalytics = "22.0.2"
+firebaseStorage = "21.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +45,8 @@ generativeai = { group = "com.google.ai.client.generativeai", name = "generative
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics", version.ref = "firebaseCrashlytics" }
 firebase-perf = { group = "com.google.firebase", name = "firebase-perf", version.ref = "firebasePerf" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics", version.ref = "firebaseAnalytics" }
+firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

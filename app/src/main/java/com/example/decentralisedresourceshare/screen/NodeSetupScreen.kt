@@ -276,7 +276,7 @@ fun NodeSetupScreen(
                     modifier = Modifier
                         .padding(8.dp)
                 ) {
-                    Text(text = "SignUp!")
+                    Text(text = "Apply")
                 }
                 if (search.value){
                     LauncherDialog(navController =navController)

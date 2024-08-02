@@ -104,7 +104,7 @@ fun PendingScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                    text = "         Pending Nodes",
+                    text = "      Pending Nodes",
                     fontSize = 30.sp,
                     color = Color.Black,
                     fontFamily = FontFamily.SansSerif,
@@ -130,7 +130,7 @@ fun PendingScreen(
                 ) {
                     item {
                         Text(
-                            text = "         Pending Nodes",
+                            text = "      Pending Nodes",
                             fontSize = 30.sp,
                             color = Color.Black,
                             fontFamily = FontFamily.SansSerif,

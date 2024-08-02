@@ -1,25 +1,18 @@
 package com.example.decentralisedresourceshare.screen
 
-
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -37,25 +30,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.decentralisedresourceshare.R
-import com.example.decentralisedresourceshare.data.Node
-import com.example.decentralisedresourceshare.states.approvedSavedNodes
-import com.example.decentralisedresourceshare.states.savedNodes
+import com.example.decentralisedresourceshare.nav.DestinationScreen
+import com.example.decentralisedresourceshare.states.allImageUriList
+import com.example.decentralisedresourceshare.states.profilesPics
 import com.example.decentralisedresourceshare.ui.DcvViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.decentralisedresourceshare.util.navigateTo
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApprovedScreen(
+fun DownloadImageScreen(
     viewModel: DcvViewModel,
     navController: NavController
 ) {
-viewModel.populateApprovedNode()
+    viewModel.populateApprovedNode()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -79,7 +72,7 @@ viewModel.populateApprovedNode()
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surface)
     ) {
-        val nodeDisp = approvedSavedNodes.value
+        viewModel.onShowAllPics()
         Box(
             modifier = Modifier
                 .background(Color.White)
@@ -87,6 +80,9 @@ viewModel.populateApprovedNode()
                 .fillMaxHeight()
                 .fillMaxSize(),
         ) {
+            profilesPics.value.forEach {
+                Text(text = it.uid.toString())
+            }
             Image(
                 alpha = 0.40f,
                 painter = painterResource(id = R.drawable.img),
@@ -95,86 +91,53 @@ viewModel.populateApprovedNode()
                 modifier = Modifier
                     .fillMaxSize()
             )
-            if (nodeDisp.isEmpty()) {
+            if (allImageUriList.isEmpty()) {
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(it)
-                        .verticalScroll(rememberScrollState())
                         .background(color = Color.Transparent),
-                    verticalArrangement = Arrangement.Top,
+                    verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    Spacer(modifier = Modifier.size(225.dp))
-                    Text(
-                        color = Color.Black,
-                        text = "No Approved Node Applications",
-                        fontSize = 25.sp
-                    )
-                }
+                    Card(
+                        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.error)
+                    ) {
 
-            } else {
-
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it)
-                        .background(color = Color.Transparent)
-                ) {
-                    item {
                         Text(
-                            text = "         Approved Node",
-                            fontSize = 30.sp,
-                            color = Color.Black,
-                            fontFamily = FontFamily.SansSerif,
-                            fontWeight = FontWeight.Bold,
+                            text = "No Photos Available",
+                            fontSize = 25.sp,
                             modifier = Modifier.padding(8.dp)
                         )
                     }
-                    items(nodeDisp){nodes->
-                        NodeCardApproved(node = nodes)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp),
+                ) {
+                    items(allImageUriList) {
+                        if (it != null) {
+                            AsyncImage(
+                                model = it.bitmap,
+                                contentScale = ContentScale.Crop,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .clickable {
+//                                        navigateTo(
+//                                            navController = navController,
+//                                            DestinationScreen.DeletePicsScreen.createRoute(uid = it.uid!!,type = "allPics")
+//                                        )
+                                    }
+                            )
+                        }
                     }
                 }
-            }
-
-        }
-    }
-}
-
-@Composable
-fun NodeCardApproved(
-    node :Node
-){
-    Card(
-        modifier = Modifier
-            .height(140.dp)
-            .fillMaxWidth()
-            .padding(8.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.error)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.Start,
-            verticalArrangement = Arrangement.Top
-        ) {
-            Row {
-                Text(text = "UserName : ", fontWeight = FontWeight.SemiBold)
-                Text(text = node.name, fontWeight = FontWeight.SemiBold)
-            }
-            Row {
-                Text(text = "RAM size : ", fontWeight = FontWeight.SemiBold)
-                Text(text = node.ramSpecification, fontWeight = FontWeight.SemiBold)
-            }
-            Row {
-                Text(text = "GPU size : ", fontWeight = FontWeight.SemiBold)
-                Text(text = node.gpuSpecification, fontWeight = FontWeight.SemiBold)
-            }
-            Row {
-                Text(text = "Status : ", fontWeight = FontWeight.SemiBold)
-                Text(text = "Approved!!", fontWeight = FontWeight.SemiBold)
             }
         }
     }

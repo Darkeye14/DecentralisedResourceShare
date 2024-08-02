@@ -40,8 +40,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DecentralisedResourceShareTheme {
-     //          DIONavigation(uriState = uriState, imagePicker = imagePicker)
-                CrashlyticsTest()
+               DIONavigation(uriState = uriState, imagePicker = imagePicker)
+
             }
         }
     }

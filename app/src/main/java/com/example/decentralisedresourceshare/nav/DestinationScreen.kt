@@ -8,4 +8,8 @@ sealed class DestinationScreen(val route : String) {
     data object NodeSetupScreen:DestinationScreen("NodeSetupScreen")
     data object GeminiSearchScreen:DestinationScreen("geminiSearchScreen")
     data object ApprovedNodeScreen:DestinationScreen("ApprovedNodeScreen")
+    data object PicsUploadScreen:DestinationScreen("picsUploadScreen")
+    data object PicsDownloadScreen:DestinationScreen("picsDownloadScreen")
+    data object DevDetailsScreen:DestinationScreen("devDetailsScreen")
+    data object DocsScreen:DestinationScreen("DocsScreen")
 }
