@@ -39,8 +39,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DecentralisedResourceShareTheme {
-      //         DIONavigation()
-                GeminiHomeScreen(uriState = uriState, imagePicker = imagePicker)
+               DIONavigation(uriState = uriState, imagePicker = imagePicker)
             }
         }
     }

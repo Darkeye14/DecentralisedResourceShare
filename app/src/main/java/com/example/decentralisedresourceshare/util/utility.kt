@@ -61,39 +61,4 @@ fun OnErrorMessage(
     Toast.makeText(LocalContext.current, errorMsg.value, Toast.LENGTH_SHORT).show()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun HomeScreenCard(
-    text: String,
-    onClick: () -> Unit,
-) {
 
-    Card(modifier = Modifier
-        .background(Color.Transparent)
-        .size(250.dp)
-        .alpha(0.40f)
-        .clickable {
-            onClick.invoke()
-        }
-        .padding(8.dp),
-        colors = CardDefaults.cardColors(MaterialTheme.colorScheme.primary)) {
-
-        Row(
-            modifier = Modifier.fillMaxSize()
-                .background(Color.Transparent),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.padding(8.dp),
-                textAlign = TextAlign.Center,
-                text = text,
-                maxLines = 2,
-                fontSize = 25.sp,
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
-
-    }
-}

@@ -5,21 +5,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.decentralisedresourceshare.ACCOUNTS
+import com.example.decentralisedresourceshare.NODES
 import com.example.decentralisedresourceshare.data.Account
 import com.example.decentralisedresourceshare.data.Chat
 import com.example.decentralisedresourceshare.data.ChatData
+import com.example.decentralisedresourceshare.data.Node
 import com.example.decentralisedresourceshare.geminiChat.ChatState
 import com.example.decentralisedresourceshare.geminiChat.ChatUiEvent
 import com.example.decentralisedresourceshare.nav.DestinationScreen
+import com.example.decentralisedresourceshare.states.approvedSavedNodes
 import com.example.decentralisedresourceshare.states.errorMsg
 import com.example.decentralisedresourceshare.states.inProgress
 import com.example.decentralisedresourceshare.states.onError
+import com.example.decentralisedresourceshare.states.savedNodes
 import com.example.decentralisedresourceshare.states.signIn
 import com.example.decentralisedresourceshare.util.navigateTo
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -37,14 +42,15 @@ class DcvViewModel @Inject constructor(
     val auth: FirebaseAuth,
     private val db: FirebaseFirestore,
     private val storage: FirebaseStorage
-): ViewModel() {
+) : ViewModel() {
     init {
         val currentUser = auth.currentUser
         signIn.value = currentUser != null
         currentUser?.uid?.let {
-      //      getUserData(it)
+            //      getUserData(it)
         }
     }
+
     fun signUp1(
         name: String,
         email: String,
@@ -61,13 +67,17 @@ class DcvViewModel @Inject constructor(
             .addOnCompleteListener {
 
                 if (it.isSuccessful) {
-                    createAccount(name,email, password)
+                    createAccount(name, email, password)
                     inProgress.value = false
                     navigateTo(navController, DestinationScreen.HomeScreen.route)
                 } else {
                     handleException(customMessage = " SignUp error")
                 }
             }
+    }
+
+    init {
+        populatePendingNode()
     }
 
     private fun createAccount(
@@ -144,8 +154,7 @@ class DcvViewModel @Inject constructor(
                 }
             } catch (e: FirebaseAuthException) {
                 handleException(e)
-            }
-            catch (e: Exception){
+            } catch (e: Exception) {
                 handleException(e)
             }
             inProgress.value = false
@@ -181,28 +190,28 @@ class DcvViewModel @Inject constructor(
     ) = CoroutineScope(Dispatchers.Main).launch {
         delay(500)
         navigateTo(navController, DestinationScreen.HomeScreen.route)
- //       populatePost()
+        //       populatePost()
     }
 
 
     private val _chatState = MutableStateFlow(ChatState())
     val chatState = _chatState.asStateFlow()
 
-    fun onEvent(event: ChatUiEvent){
-        when(event){
+    fun onEvent(event: ChatUiEvent) {
+        when (event) {
             is ChatUiEvent.SendPrompt -> {
-                if (event.prompt.isNotEmpty()){
-                    addPrompt(event.prompt,event.bitmap)
+                if (event.prompt.isNotEmpty()) {
+                    addPrompt(event.prompt, event.bitmap)
 
-                    if (event.bitmap !=null){
-                        getResponseImage(event.prompt,event.bitmap)
+                    if (event.bitmap != null) {
+                        getResponseImage(event.prompt, event.bitmap)
 
-                    }
-                    else{
+                    } else {
                         getResponse(event.prompt)
                     }
                 }
             }
+
             is ChatUiEvent.UpdatePrompt -> {
                 _chatState.update {
                     it.copy(prompt = event.newPrompt)
@@ -210,18 +219,20 @@ class DcvViewModel @Inject constructor(
             }
         }
     }
-    private fun addPrompt(prompt : String, bitmap: Bitmap?){
+
+    private fun addPrompt(prompt: String, bitmap: Bitmap?) {
         _chatState.update {
             it.copy(
                 chatList = it.chatList.toMutableList().apply {
-                    add(0, Chat(prompt, bitmap = bitmap,true))
+                    add(0, Chat(prompt, bitmap = bitmap, true))
                 },
                 prompt = "",
                 bitmap = null
             )
         }
     }
-    private fun getResponse(prompt : String){
+
+    private fun getResponse(prompt: String) {
         viewModelScope.launch {
             val chat = ChatData.getResponseWithImage(prompt)
             _chatState.update {
@@ -234,9 +245,9 @@ class DcvViewModel @Inject constructor(
         }
     }
 
-    private fun getResponseImage(prompt : String,bitmap: Bitmap){
+    private fun getResponseImage(prompt: String, bitmap: Bitmap) {
         viewModelScope.launch {
-            val chat = ChatData.getResponseWithImage(prompt,bitmap)
+            val chat = ChatData.getResponseWithImage(prompt, bitmap)
             _chatState.update {
                 it.copy(
                     chatList = it.chatList.toMutableList().apply {
@@ -245,6 +256,63 @@ class DcvViewModel @Inject constructor(
                 )
             }
         }
+    }
+
+    fun setUpNode(
+        name: String,
+        deviceIfcnNumber: String,
+        deviceInfo: String,
+        resourceSpecfication: String,
+        ramSpecification: String,
+        gpuSpecification: String
+    ) = CoroutineScope(Dispatchers.Main).launch {
+        val auth = auth.currentUser?.uid.toString()
+        val node = Node(
+            auth = auth,
+            name = name,
+            deviceIfcnNumber = deviceIfcnNumber,
+            deviceInfo = deviceInfo,
+            resourceSpecfication = resourceSpecfication,
+            ramSpecification = ramSpecification,
+            gpuSpecification = gpuSpecification
+        )
+        db.collection(NODES)
+            .document(auth)
+            .set(node)
+
+    }
+
+    fun populatePendingNode() = CoroutineScope(Dispatchers.Main).launch {
+        db.collection(NODES)
+            .whereEqualTo("auth", auth.currentUser?.uid?.toString())
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    handleException(error, "cannot retrieve user")
+                }
+                if (value != null) {
+                    savedNodes.value = value.documents.mapNotNull {
+                        it.toObject<Node>()
+                    }
+
+                }
+            }
+
+    }
+    fun populateApprovedNode() = CoroutineScope(Dispatchers.Main).launch {
+        db.collection(NODES)
+            .whereEqualTo("auth", auth.currentUser?.uid?.toString())
+            .addSnapshotListener { value, error ->
+                if (error != null) {
+                    handleException(error, "cannot retrieve user")
+                }
+                if (value != null) {
+                    approvedSavedNodes.value = value.documents.mapNotNull {
+                        it.toObject<Node>()
+                    }
+
+                }
+            }
+
     }
 
 

@@ -5,6 +5,7 @@ plugins {
     id ("com.google.dagger.hilt.android")
     alias(libs.plugins.google.gms.google.services)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    alias(libs.plugins.google.firebase.crashlytics)
 }
 
 android {
@@ -69,6 +70,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.generativeai)
     implementation(libs.volley)
+    implementation(libs.firebase.crashlytics)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
