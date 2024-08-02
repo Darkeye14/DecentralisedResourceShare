@@ -8,6 +8,13 @@ espressoCore = "3.6.0"
 lifecycleRuntimeKtx = "2.8.2"
 activityCompose = "1.9.0"
 composeBom = "2024.04.01"
+googleGmsGoogleServices = "4.4.2"
+firebaseAuth = "23.0.0"
+firebaseStorageKtx = "21.0.0"
+firebaseFirestoreKtx = "25.0.0"
+firebaseFirestore = "25.0.0"
+generativeai = "0.9.0"
+volley = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -24,8 +31,15 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
+firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "743293795653",
+    "project_id": "decentralisedresshare",
+    "storage_bucket": "decentralisedresshare.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:743293795653:android:81827b20f32f425e7ed22c",
+        "android_client_info": {
+          "package_name": "com.example.decentralisedresourceshare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2zQb5qpjWmqoHixuEhj517Lf8HUuR6y0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
