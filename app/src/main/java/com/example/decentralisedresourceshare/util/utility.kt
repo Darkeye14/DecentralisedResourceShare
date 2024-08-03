@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.decentralisedresourceshare.nav.DestinationScreen
 import com.example.decentralisedresourceshare.states.errorMsg
+import com.example.decentralisedresourceshare.states.signIn
+import com.example.decentralisedresourceshare.ui.DcvViewModel
 
 @Composable
 fun CommonProgressBar() {
@@ -87,4 +91,28 @@ fun ImageList() : List<Uri?> {
     }
     Spacer(modifier = Modifier.padding(8.dp))
     return uriState
+}
+
+@Composable
+fun CheckSignedIn(
+    viewModel: DcvViewModel,
+    navController: NavController
+) {
+    val alreadySignedIn = remember { mutableStateOf(false) }
+    val signIn = signIn.value
+    if (signIn && !alreadySignedIn.value) {
+        alreadySignedIn.value = true
+        LaunchedEffect(key1 = Unit) {
+            navController.navigate(DestinationScreen.HomeScreen.route) {
+                popUpTo(0)
+            }
+        }
+
+    } else if (!signIn) {
+        LaunchedEffect(key1 = Unit) {
+            navController.navigate(DestinationScreen.SignUpScreen.route) {
+                popUpTo(0)
+            }
+        }
+    }
 }

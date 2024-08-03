@@ -15,6 +15,7 @@ import com.example.decentralisedresourceshare.screen.GeminiHomeScreen
 import com.example.decentralisedresourceshare.screen.HomeScreen
 import com.example.decentralisedresourceshare.screen.NodeSetupScreen
 import com.example.decentralisedresourceshare.screen.PendingScreen
+import com.example.decentralisedresourceshare.screen.SplashScreen
 import com.example.decentralisedresourceshare.screen.UploadImageScreen
 import com.example.decentralisedresourceshare.screen.auth.Login
 import com.example.decentralisedresourceshare.screen.auth.SignUp
@@ -33,7 +34,7 @@ fun DIONavigation(
 
     NavHost(
         navController = navController,
-        startDestination = DestinationScreen.SignUpScreen.route
+        startDestination = DestinationScreen.SplashScreen.route
     ) {
         composable(DestinationScreen.HomeScreen.route) {
             HomeScreen(navController)
@@ -67,6 +68,9 @@ fun DIONavigation(
         }
         composable(DestinationScreen.DocsScreen.route) {
             DocsScreen(viewModel = viewModel, navController = navController)
+        }
+        composable(DestinationScreen.SplashScreen.route) {
+            SplashScreen(navController = navController, viewModel = viewModel)
         }
     }
 }
