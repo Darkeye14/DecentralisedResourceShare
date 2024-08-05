@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material3.Button
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -39,10 +40,16 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DecentralisedResourceShareTheme {
-      //         DIONavigation()
-                GeminiHomeScreen(uriState = uriState, imagePicker = imagePicker)
+               DIONavigation(uriState = uriState, imagePicker = imagePicker)
+
             }
         }
     }
 }
 
+@Composable
+fun CrashlyticsTest(){
+    Button(onClick = { throw RuntimeException("Test Crash")}) {
+        Text(text = "Test Crash")
+    }
+}

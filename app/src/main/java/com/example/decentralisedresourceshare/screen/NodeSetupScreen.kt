@@ -1,9 +1,9 @@
+package com.example.decentralisedresourceshare.screen
 
-package com.example.decentralisedresourceshare.screen.auth
-
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,16 +40,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.decentralisedresourceshare.R
 import com.example.decentralisedresourceshare.nav.DestinationScreen
-import com.example.decentralisedresourceshare.states.inProgress
-import com.example.decentralisedresourceshare.states.onError
 import com.example.decentralisedresourceshare.ui.DcvViewModel
-import com.example.decentralisedresourceshare.util.CommonProgressBar
-import com.example.decentralisedresourceshare.util.OnErrorMessage
 import com.example.decentralisedresourceshare.util.navigateTo
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUp(
+fun NodeSetupScreen(
+    uriState : MutableStateFlow<String>,
+    imagePicker : ActivityResultLauncher<PickVisualMediaRequest>,
     viewModel: DcvViewModel,
     navController: NavController
 ) {
@@ -91,7 +91,6 @@ fun SignUp(
                 modifier = Modifier
                     .fillMaxSize()
             )
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -100,40 +99,33 @@ fun SignUp(
                     .background(color = Color.Transparent),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-
-                val emailState = remember {
-                    mutableStateOf(TextFieldValue())
-                }
-
-                val passwordState = remember {
-                    mutableStateOf(TextFieldValue())
-                }
                 val nameState = remember {
                     mutableStateOf(TextFieldValue())
                 }
-
-//                Image(
-//                    painter = painterResource(id = R.drawable.education),
-//                    contentDescription = "LogIn",
-//                    modifier = Modifier
-//                        .width(200.dp)
-//                        .padding(top = 16.dp)
-//                        .padding(8.dp)
-//                )
-
+                val deviceIfcnNumberState = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val deviceInfoState = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val resourceSpecficationState = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val ramSpecficationState = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val gpuSpecficationState = remember {
+                    mutableStateOf(TextFieldValue())
+                }
+                val search = remember{ mutableStateOf(false) }
                 Text(
-                    text = "SignUp",
+                    text = "Setup a Node (apply)",
                     fontSize = 30.sp,
                     color = Color.Black,
                     fontFamily = FontFamily.SansSerif,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(8.dp)
                 )
-                if (inProgress.value) {
-                    CommonProgressBar()
-                }
-
                 OutlinedTextField(
                     value = nameState.value,
                     singleLine = true,
@@ -146,81 +138,184 @@ fun SignUp(
                     },
                     label = {
                         Text(
-                            text = "Name",
-                            modifier = Modifier
-                                .padding(8.dp)
-                        )
-                    }
-                )
-
-                OutlinedTextField(
-                    value = emailState.value,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done
-                    ),
-                    colors = TextFieldDefaults.colors(),
-                    onValueChange = {
-                        emailState.value = it
-                    },
-                    label = {
-                        Text(
-                            text = "Email",
+                            text = "UserName",
                             modifier = Modifier
                                 .padding(8.dp)
                         )
                     }
                 )
                 OutlinedTextField(
-                    colors = TextFieldDefaults.colors(),
-                    value = passwordState.value,
+                    value = deviceIfcnNumberState.value,
                     singleLine = true,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Done
                     ),
+                    colors = TextFieldDefaults.colors(),
                     onValueChange = {
-                        passwordState.value = it
+                        deviceIfcnNumberState.value = it
                     },
                     label = {
                         Text(
-                            text = "Password",
+                            text = "Ifcn Number",
                             modifier = Modifier
                                 .padding(8.dp)
                         )
                     }
                 )
-                if (onError.value){
-                    OnErrorMessage()
-                }
 
                 Button(
                     onClick = {
-                        viewModel.signUp1(
-                            name = nameState.value.text.trim(),
-                            emailState.value.text.trim(),
-                            passwordState.value.text.trim(),
-                            navController
+                        navigateTo(navController, DestinationScreen.GeminiSearchScreen.route)
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                ) {
+                    Text(text = "Know How!")
+                }
+
+                OutlinedTextField(
+                    value = deviceInfoState.value,
+                    onValueChange = {
+                        deviceInfoState.value = it
+                    },
+                    colors = TextFieldDefaults.colors(),
+                    placeholder = {
+                        Text(
+                            text = "include company, model name of the device",
+                            modifier = Modifier
+                                .padding(8.dp)
                         )
+                    },
+                    label = {
+                        Text(
+                            text = "Device Info",
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    },
+//                    keyboardOptions = KeyboardOptions.Default.copy(
+//                        imeAction = ImeAction.Done
+//                    )
+                )
+                OutlinedTextField(
+                    value = ramSpecficationState.value,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    colors = TextFieldDefaults.colors(),
+                    onValueChange = {
+                        ramSpecficationState.value = it
+                    },
+                    label = {
+                        Text(
+                            text = "Available RAM size",
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    }
+                )
+                OutlinedTextField(
+                    value = gpuSpecficationState.value,
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    colors = TextFieldDefaults.colors(),
+                    onValueChange = {
+                        gpuSpecficationState.value = it
+                    },
+                    label = {
+                        Text(
+                            text = "Available Gpu Resource size ",
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    }
+                )
+
+                OutlinedTextField(
+                    value = resourceSpecficationState.value,
+                    onValueChange = {
+                        resourceSpecficationState.value = it
+                    },
+                    colors = TextFieldDefaults.colors(),
+                    placeholder = {
+                        Text(
+                            text = "include any additional info",
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    },
+                    label = {
+                        Text(
+                            text = "Device Info",
+                            modifier = Modifier
+                                .padding(8.dp)
+                        )
+                    },
+//                    keyboardOptions = KeyboardOptions.Default.copy(
+//                        imeAction = ImeAction.Done
+//                    )
+                )
+
+
+                Button(
+                    onClick = {
+                        viewModel.setUpNode(
+                            name = nameState.value.text.trim(),
+                            deviceIfcnNumber = deviceIfcnNumberState.value.text.trim(),
+                            deviceInfo = deviceInfoState.value.text.trim(),
+                            resourceSpecfication = resourceSpecficationState.value.text,
+                              ramSpecification = ramSpecficationState.value.text,
+                              gpuSpecification = gpuSpecficationState.value.text
+                        )
+                        search.value =true
 
                     },
                     modifier = Modifier
                         .padding(8.dp)
                 ) {
-                    Text(text = "SignUp!")
+                    Text(text = "Apply")
                 }
-                Text(
-                    text = "Already a user ? Login! ",
-                    color = Color.Black,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .clickable {
-                            navigateTo(navController, DestinationScreen.LoginScreen.route)
-                        }
-                )
-
+                if (search.value){
+                    LauncherDialog(navController =navController)
+                }
             }
-
         }
+    }
+}
+
+
+
+@Composable
+fun LauncherDialog(navController: NavController) {
+    val openDialog = remember { mutableStateOf(true) }
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+
+                        openDialog.value = false
+                        navigateTo(navController,DestinationScreen.HomeScreen.route)
+                    }) {
+                    Text(text = "OK")
+                }
+            },
+            title = {
+                Text(text = "Successful", fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Text(
+                    text = "Your request has been sent for verification. You will be notified when it is approved or when this feature gets integrated. ",
+                    fontWeight = FontWeight.SemiBold
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
     }
 }

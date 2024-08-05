@@ -1,6 +1,7 @@
 package com.example.decentralisedresourceshare.data
 
 import android.graphics.Bitmap
+import com.example.decentralisedresourceshare.APIKEY
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.Dispatchers
@@ -13,7 +14,7 @@ data class Chat(
 )
 
 object ChatData {
-    val apiKey = "AIzaSyAGmnHGuXP9D_2ZQ50o8O1c2T8-Wk5sWWk"
+    val apiKey = APIKEY
 //        "AIzaSyBByxYhe7D_CWbCyrbPiBn3g4XfCo3bznE"
     suspend fun getResponseWithImage(prompt : String) : Chat{
         val generativeModel = GenerativeModel(
