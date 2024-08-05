@@ -75,11 +75,12 @@ dependencies {
     implementation(libs.firebase.perf)
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.storage)
+ //   implementation(libs.androidx.ui.test.junit4.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+  //  androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -105,4 +106,8 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
 
     implementation("com.google.ai.client.generativeai:generativeai:0.1.2")
+    androidTestImplementation("androidx.navigation:navigation-testing:2.5.3")
+
+//    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
+//    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.11.0")
 }

@@ -98,6 +98,10 @@ fun DocsScreen(
                             "Fill all the details that are needed and click on the apply button.\n" +
                             "if you have any doubts regarding the ifcn number, go ahead and ask our smart search bot!!"
                 )
+                Display(
+                    textName = "Upload Photos :",
+                    text = "This application provides you with additional cloud resources to which you can upload any images that are required"
+                )
 
             }
         }

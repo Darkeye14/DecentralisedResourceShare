@@ -227,7 +227,7 @@ fun NodeSetupScreen(
                     },
                     label = {
                         Text(
-                            text = "",
+                            text = "Available Gpu Resource size ",
                             modifier = Modifier
                                 .padding(8.dp)
                         )
