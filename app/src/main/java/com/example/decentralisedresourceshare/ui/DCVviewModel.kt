@@ -187,6 +187,8 @@ class DcvViewModel @Inject constructor(
             errorMsg.value = customMessage
         }
 
+
+
         errorMsg.value = exception.toString()
         exception?.printStackTrace()
         val errorMsg = exception?.localizedMessage
